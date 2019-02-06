@@ -9,6 +9,10 @@
 import Foundation
 
 struct Concentration {
+    
+    private (set) var score = 0
+    private (set) var flipCount = 0
+    private var seenCards: Set<Int> = []
     private (set) var cards = [Card]()
     
     private var indexOfOneAndOnlyFaceUpCard: Int? {
@@ -25,10 +29,21 @@ struct Concentration {
     mutating func chooseCard(at index: Int) {
         assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index): choosen index not in the cards")
         if !cards[index].isMatched {
+            flipCount += 1
             if let matchIndex = indexOfOneAndOnlyFaceUpCard, matchIndex != index {
                 if cards[matchIndex] == cards[index] {
                     cards[matchIndex].isMatched = true
                     cards[index].isMatched = true
+                    score += 2
+                } else {
+                    if seenCards.contains(index) {
+                        score -= 1
+                    }
+                    if seenCards.contains(matchIndex) {
+                        score -= 1
+                    }
+                    seenCards.insert(index)
+                    seenCards.insert(matchIndex)
                 }
                 cards[index].isFaceUp = true
             } else {
@@ -44,6 +59,18 @@ struct Concentration {
             cards += [card, card]
         }
         cards.shuffle()
+    }
+    
+    mutating func resetGame() {
+        flipCount = 0
+        score = 0
+        seenCards = []
+        for index in cards.indices {
+            cards[index].isFaceUp = false
+            cards[index].isMatched = false
+            cards.shuffle()
+        }
+
     }
 }
 

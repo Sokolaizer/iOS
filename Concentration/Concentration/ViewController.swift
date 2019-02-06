@@ -16,34 +16,22 @@ class ViewController: UIViewController {
             return (cardButtons.count + 1) / 2
     }
     
-    private (set) var flipCount = 0 {
-        didSet {
-            updateFlipCountLabel()
-        }
+    
+    @IBAction func newGame(_ sender: UIButton) {
+        game.resetGame()
+        emojiChoices = emojiTheme.randomElement()!.value
+        updateViewFromModel()
     }
     
-    private func updateFlipCountLabel() {
-        let attributes: [NSAttributedString.Key: Any] = [
-            .strokeWidth: 5.0,
-            .strokeColor: #colorLiteral(red: 1, green: 0.5720329582, blue: 0.3450941814, alpha: 1)
-        ]
-        let attributedString = NSAttributedString(string: "Flips: \(flipCount)", attributes: attributes)
-        
-        flipCountLabel.attributedText = attributedString
-    }
-
-    @IBOutlet private weak var flipCountLabel: UILabel! {
-        didSet {
-            updateFlipCountLabel()
-        }
-    }
+    @IBOutlet private weak var flipCountLabel: UILabel! 
+    
+    @IBOutlet weak var scoreLabel: UILabel!
     
     @IBOutlet private var cardButtons: [UIButton]!
     
     
     
     @IBAction private func touchCard(_ sender: UIButton) {
-        flipCount += 1
         if let cardNumber = cardButtons.index(of: sender) {
             game.chooseCard(at: cardNumber)
             updateViewFromModel()
@@ -63,10 +51,23 @@ class ViewController: UIViewController {
                 button.setTitle("", for: UIControl.State.normal)
                 button.backgroundColor = card.isMatched ? #colorLiteral(red: 1, green: 0.5720329582, blue: 0.3450941814, alpha: 0) : #colorLiteral(red: 1, green: 0.5720329582, blue: 0.3450941814, alpha: 1)
             }
+            scoreLabel.text = "Score: \(game.score)"
+            flipCountLabel.text = "Flips: \(game.flipCount)"
         }
     }
     // private var emojiChoices = ["👻", "🎃", "😈", "👺", "💀", "🙀", "🧛🏻‍♂️", "🦇"]
-    private var emojiChoices = "👻🎃😈👺💀🙀🧛🏻‍♂️🦇"
+    
+    private let emojiTheme = [
+    "halloween" : "👻🎃😈👺💀🙀🧛🏻‍♂️🦇",
+    "animals" : "🐼🐔🦄🐤🙊🐝🐞🐙",
+    "sports" : "🏀🏈⚾️🎱🎾🏐⚽️🎲",
+    "faces" : "😀😢😔😗😣🤬🤯😬",
+    "cars" : "🚗🚕🚙🚌🚎🏎🚓🚑",
+    "fruits" : "🍏🍎🍐🍊🍋🍌🍉🍇",
+    "flags" : "🏳️‍🌈🇦🇺🇦🇹🇦🇿🇦🇽🇦🇱🇧🇯🇷🇺"
+    ]
+    
+    private lazy var emojiChoices = emojiTheme.randomElement()!.value
     
     private var emoji = [Card: String]()
     
